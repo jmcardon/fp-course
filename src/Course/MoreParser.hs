@@ -212,7 +212,7 @@ between p1 p2 p3 =
     p1
     r <- p3
     p2
-    return r
+    pure r
 
 -- | Write a function that applies the given parser in between the two given characters.
 --
@@ -412,4 +412,4 @@ betweenSepbyComma ::
   -> Char
   -> Parser a
   -> Parser (List a)
-betweenSepbyComma c1 c2 p1 = betweenCharTok c1 c2 (sepby p1 (is ','))
+betweenSepbyComma c1 c2 p1 = betweenCharTok c1 c2 (sepby p1 (charTok ','))

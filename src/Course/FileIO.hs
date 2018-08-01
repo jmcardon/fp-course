@@ -85,46 +85,47 @@ printFile ::
   FilePath
   -> Chars
   -> IO ()
-printFile =
-  error "todo: Course.FileIO#printFile"
+printFile fp chars = void $ ((>>= putStrLn) . readFile) fp *> putStrLn chars
+
+sequenceMap:: Applicative f => (a -> f b) -> List a -> f (List b)
+sequenceMap f =  sequence . (f <$>)
+
+voidSequence:: Applicative f => (a -> f b) -> List a -> f ()
+voidSequence f = void . sequenceMap f
 
 -- Given a list of (file name and file contents), print each.
 -- Use @printFile@.
 printFiles ::
   List (FilePath, Chars)
   -> IO ()
-printFiles =
-  error "todo: Course.FileIO#printFiles"
-
+printFiles = voidSequence (\(x, y) -> printFile x y)
+  
 -- Given a file name, return (file name and file contents).
 -- Use @readFile@.
 getFile ::
   FilePath
   -> IO (FilePath, Chars)
-getFile =
-  error "todo: Course.FileIO#getFile"
+getFile fp = (\y -> (fp, y)) <$> readFile fp 
 
 -- Given a list of file names, return list of (file name and file contents).
 -- Use @getFile@.
 getFiles ::
   List FilePath
   -> IO (List (FilePath, Chars))
-getFiles =
-  error "todo: Course.FileIO#getFiles"
+getFiles = sequenceMap getFile
 
 -- Given a file name, read it and for each line in that file, read and print contents of each.
 -- Use @getFiles@ and @printFiles@.
 run ::
   FilePath
   -> IO ()
-run =
-  error "todo: Course.FileIO#run"
+-- run f = void $ (readFile f) >>= sequence . (((<$>) putStrLn) . lines)
+run = (>>= voidSequence putStrLn . lines) . readFile
 
 -- /Tip:/ use @getArgs@ and @run@
 main ::
   IO ()
-main =
-  error "todo: Course.FileIO#main"
+main = return ()
 
 ----
 

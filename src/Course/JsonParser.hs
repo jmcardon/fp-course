@@ -2,7 +2,6 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE RebindableSyntax    #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE BangPatterns #-}
 
 module Course.JsonParser where
 
@@ -213,9 +212,20 @@ jsonNull =
 --
 -- >>> parse jsonArray "[true, \"abc\", [false]]"
 -- Result >< [JsonTrue,JsonString "abc",JsonArray [JsonFalse]]
+
+-- Interesting quip:
+-- jsonArray = betweenSepbyComma '[' ']' jsonValue will cause infinite recursion, as ghc will try to evaluate `jsonValue` 
+-- first before passing it to `betweenSepByComma
+-- thus, we must define it manually here
 jsonArray ::
   Parser (List JsonValue)
-jsonArray = betweenSepbyComma '[' ']' jsonValue
+jsonArray = 
+  do
+    _ <- charTok '['
+    res <- sepby jsonValue (charTok ',')
+    _ <- charTok ']'
+    pure res
+
 
 -- | Parse a JSON object.
 --

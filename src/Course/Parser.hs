@@ -446,12 +446,20 @@ firstNameParser =  (<$> list lower) . (:.) =<< upper
 --
 -- /Tip:/ Use @(=<<)@, @pure@, @upper@, @thisMany@, @lower@ and @list@.
 --
+-- >>> parse surnameParser "Abcdef"
+-- Result >< "Abcdef"
+--
+-- >>> parse surnameParser "Abcdefghijklmnopqrstuvwxyz"
+-- Result >< "Abcdefghijklmnopqrstuvwxyz"
+--
+-- >>> isErrorResult (parse surnameParser "Abc")
+-- True
+--
 -- >>> isErrorResult (parse surnameParser "abc")
 -- True
 surnameParser ::
   Parser Chars
-surnameParser =
-  error "todo: Course.Parser#surnameParser"
+surnameParser = (<$> list lower) . (++) =<< (<$> (thisMany 5 lower)) . (:.) =<< upper
 
 -- | Write a parser for Person.smoker.
 --
@@ -469,8 +477,7 @@ surnameParser =
 -- True
 smokerParser ::
   Parser Bool
-smokerParser =
-  error "todo: Course.Parser#smokerParser"
+smokerParser = (== 'y') <$> (is 'y' ||| is 'n')
 
 -- | Write part of a parser for Person#phoneBody.
 -- This parser will only produce a string of digits, dots or hyphens.
@@ -491,8 +498,7 @@ smokerParser =
 -- Result >a123-456< ""
 phoneBodyParser ::
   Parser Chars
-phoneBodyParser =
-  error "todo: Course.Parser#phoneBodyParser"
+phoneBodyParser = list (digit ||| is '.' ||| is '-')
 
 -- | Write a parser for Person.phone.
 --
@@ -513,8 +519,7 @@ phoneBodyParser =
 -- True
 phoneParser ::
   Parser Chars
-phoneParser =
-  error "todo: Course.Parser#phoneParser"
+phoneParser = digit >>= ((<$> phoneBodyParser)  . (:.)) >>= (\a -> (const a) <$> is '#')
 
 -- | Write a parser for Person.
 --
@@ -567,8 +572,19 @@ phoneParser =
 -- Result >< Person 123 "Fred" "Clarkson" True "123-456.789"
 personParser ::
   Parser Person
-personParser =
-  error "todo: Course.Parser#personParser"
+personParser = 
+  do 
+    age <- ageParser
+    spaces1
+    name <- firstNameParser
+    spaces1
+    lname <- surnameParser
+    spaces1
+    smoker <- smokerParser
+    spaces1
+    phone <- phoneParser
+    return $ Person age name lname smoker phone
+
 
 -- Make sure all the tests pass!
 

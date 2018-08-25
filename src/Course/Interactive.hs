@@ -1,16 +1,16 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Course.Interactive where
 
-import Course.Core
-import Course.Functor
-import Course.Applicative
-import Course.Monad
-import Course.Traversable
-import Course.List
-import Course.Optional
+import           Course.Applicative
+import           Course.Core
+import           Course.Functor
+import           Course.List
+import           Course.Monad
+import           Course.Optional
+import           Course.Traversable
 
 -- | Eliminates any value over which a functor is defined.
 vooid ::
@@ -83,7 +83,11 @@ data Op =
 convertInteractive ::
   IO ()
 convertInteractive =
-  error "todo: Course.Interactive#convertInteractive"
+  do
+    putStr "Enter some text to upper case: "
+    line <- getLine
+    let ups = toUpper <$> line in
+      putStrLn ups
 
 -- |
 --
@@ -111,7 +115,13 @@ convertInteractive =
 reverseInteractive ::
   IO ()
 reverseInteractive =
-  error "todo: Course.Interactive#reverseInteractive"
+  do
+    putStr "Enter a file to reverse"
+    file <- getLine
+    putStr "Enter a file name to output contents"
+    nFile <- getLine
+    fileContents <- readFile file
+    writeFile nFile (reverse fileContents)
 
 -- |
 --
@@ -137,7 +147,20 @@ reverseInteractive =
 encodeInteractive ::
   IO ()
 encodeInteractive =
-  error "todo: Course.Interactive#encodeInteractive"
+  do
+    putStr "Enter a string to url encode"
+    str <- getLine
+    putStrLn $ encode str
+  where
+    encode::Chars -> Chars
+    encode Nil = Nil
+    encode (x:.xs) =
+      let str = case x of ' '  -> "%20"
+                          '\t' -> "%09"
+                          '"'  -> "%22"
+                          _    -> pure x
+                          in str ++ encode xs
+
 
 interactive ::
   IO ()

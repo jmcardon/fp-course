@@ -226,7 +226,6 @@ jsonArray =
     _ <- charTok ']'
     pure res
 
-
 -- | Parse a JSON object.
 --
 -- /Tip:/ Use `jsonString`, `charTok`, `betweenSepbyComma` and `jsonValue`.

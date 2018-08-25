@@ -233,10 +233,10 @@ instance Functor f => Functor (OptionalT f) where
 -- [Full 2,Empty,Full 3,Empty]
 instance Monad f => Applicative (OptionalT f) where
   pure = OptionalT . pure . pure
-  (<*>) (OptionalT ff) (OptionalT fa) = OptionalT(ff >>= (\o -> applyOrEmpty o fa))
+  (<*>) (OptionalT ff) (OptionalT fa) = OptionalT(ff >>= (`applyOrEmpty` fa))
 
 applyOrEmpty::Monad f => Optional (a -> b) ->  f(Optional a) -> f (Optional b)
-applyOrEmpty Empty _ = pure(Empty)
+applyOrEmpty Empty _ = pure Empty
 applyOrEmpty (Full f) ff = ((<$>) . (<$>)) f ff 
 
 emptyT::Applicative f => OptionalT f a
